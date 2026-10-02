@@ -51,7 +51,7 @@ export const ComplaintDetail = () => {
   const statusColor = getStatusColor(complaint.status);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
+    <div className="detail-grid">
       
       {/* Main Detail Area */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -60,7 +60,7 @@ export const ComplaintDetail = () => {
             <div>
               <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '0.5rem' }}>{complaint.title}</h2>
               <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                {complaint.id} • Created on {new Date(complaint.created_at).toLocaleString()}
+                {complaint.display_id || complaint.id} • Created on {new Date(complaint.created_at).toLocaleString()}
               </div>
             </div>
             <span style={{ 
@@ -76,7 +76,7 @@ export const ComplaintDetail = () => {
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem', padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: '4px' }}>
+          <div className="info-grid" style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: '4px' }}>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600', marginBottom: '0.25rem' }}>Category</div>
               <div style={{ textTransform: 'capitalize' }}>{complaint.category}</div>
@@ -91,8 +91,14 @@ export const ComplaintDetail = () => {
             </div>
             <div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600', marginBottom: '0.25rem' }}>Student ID</div>
-              <div>{complaint.student_id}</div>
+              <div>STU-{complaint.student_id.substring(0, 4).toUpperCase()}</div>
             </div>
+            {role === 'admin' && (
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '600', marginBottom: '0.25rem' }}>Student Name</div>
+                <div>{complaint.profiles?.name || 'Unknown Student'}</div>
+              </div>
+            )}
           </div>
 
           <div>

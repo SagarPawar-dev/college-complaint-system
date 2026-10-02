@@ -1,185 +1,193 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from './AuthContext';
 
 const ComplaintContext = createContext();
 
-const mockComplaints = [
-  {
-    id: 'CMP-00001',
-    title: 'Broken projector in Room 302',
-    category: 'infrastructure',
-    description: 'The projector is not turning on. It seems the power cable is faulty.',
-    location: 'Building A, Room 302',
-    priority: 'high',
-    status: 'submitted',
-    student_id: 'user-1',
-    created_at: new Date(Date.now() - 100000000).toISOString(),
-    activities: [
-      {
-        id: 'act-1',
-        activity_type: 'created',
-        created_at: new Date(Date.now() - 100000000).toISOString(),
-      }
-    ]
-  },
-  {
-    id: 'CMP-00002',
-    title: 'Hostel WiFi dropping constantly',
-    category: 'hostel',
-    description: 'The WiFi on the 3rd floor of the boys hostel drops every 10 minutes.',
-    location: 'Boys Hostel, 3rd Floor',
-    priority: 'medium',
-    status: 'in_progress',
-    student_id: 'user-1',
-    created_at: new Date(Date.now() - 500000000).toISOString(),
-    activities: [
-      {
-        id: 'act-2',
-        activity_type: 'created',
-        created_at: new Date(Date.now() - 500000000).toISOString(),
-      },
-      {
-        id: 'act-3',
-        activity_type: 'status_change',
-        old_status: 'submitted',
-        new_status: 'under_review',
-        created_at: new Date(Date.now() - 400000000).toISOString(),
-      },
-      {
-        id: 'act-4',
-        activity_type: 'status_change',
-        old_status: 'under_review',
-        new_status: 'in_progress',
-        created_at: new Date(Date.now() - 300000000).toISOString(),
-      }
-    ]
-  },
-  {
-    id: 'CMP-00003',
-    title: 'Incorrect grade in Math 101',
-    category: 'academic',
-    description: 'My final grade was entered as a C, but my portal shows I scored 85%.',
-    location: 'N/A',
-    priority: 'high',
-    status: 'resolved',
-    student_id: 'user-2',
-    created_at: new Date(Date.now() - 900000000).toISOString(),
-    activities: [
-      {
-        id: 'act-5',
-        activity_type: 'created',
-        created_at: new Date(Date.now() - 900000000).toISOString(),
-      },
-      {
-        id: 'act-6',
-        activity_type: 'status_change',
-        old_status: 'submitted',
-        new_status: 'resolved',
-        created_at: new Date(Date.now() - 800000000).toISOString(),
-      }
-    ]
-  }
-];
-
 export const ComplaintProvider = ({ children }) => {
-  const [complaints, setComplaints] = useState(mockComplaints);
+  const [complaints, setComplaints] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const { user } = useAuth();
 
-  const addNotification = (userId, type, title, message, complaintId) => {
-    const newNotification = {
-      id: `notif-${Date.now()}`,
-      user_id: userId,
-      type,
-      title,
-      message,
-      complaint_id: complaintId,
-      is_read: false,
-      created_at: new Date().toISOString()
-    };
-    setNotifications(prev => [newNotification, ...prev]);
-  };
+  const loadData = useCallback(async () => {
+    if (!user) {
+      setComplaints([]);
+      setNotifications([]);
+      return;
+    }
 
-  const markNotificationRead = (id) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-  };
-
-  const addComplaint = (complaintData) => {
-    const newComplaint = {
-      id: `CMP-${String(complaints.length + 1).padStart(5, '0')}`,
-      ...complaintData,
-      status: 'submitted',
-      created_at: new Date().toISOString(),
-      activities: [
-        {
-          id: `act-${Date.now()}`,
-          activity_type: 'created',
-          created_at: new Date().toISOString(),
-        }
-      ]
-    };
-    setComplaints([newComplaint, ...complaints]);
-    return newComplaint;
-  };
-
-  const updateComplaintStatus = (id, newStatus, content) => {
-    setComplaints(complaints.map(c => {
-      if (c.id === id) {
-        const activity = {
-          id: `act-${Date.now()}`,
-          activity_type: 'status_change',
-          old_status: c.status,
-          new_status: newStatus,
-          content,
-          created_at: new Date().toISOString(),
-        };
+    try {
+      // 1. Fetch complaints
+      const { data: complaintsData, error: complaintsError } = await supabase
+        .from('complaints')
+        .select(`
+          *,
+          profiles(name),
+          activities (
+            *
+          )
+        `)
+        .order('created_at', { ascending: false });
         
-        // Notify student of status change
-        if (c.status !== newStatus) {
-           addNotification(
-             c.student_id, 
-             'status_change', 
-             'Complaint Status Updated', 
-             `Your complaint ${c.id} has been ${newStatus.replace('_', ' ')}.`,
-             c.id
-           );
-        }
+      if (complaintsError) throw complaintsError;
 
-        return {
-          ...c,
-          status: newStatus,
-          activities: [...c.activities, activity].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        };
+      // Sort activities inside each complaint
+      const formattedComplaints = complaintsData.map(c => ({
+        ...c,
+        id: c.id, 
+        display_id: `CMP-${String(c.display_id).padStart(5, '0')}`,
+        activities: (c.activities || []).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      }));
+      setComplaints(formattedComplaints);
+
+      // 2. Fetch notifications
+      const { data: notifData, error: notifError } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (notifError) throw notifError;
+      setNotifications(notifData || []);
+
+    } catch (err) {
+      console.error("Error loading data:", err.message);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const addNotification = async (userId, type, title, message, complaintId) => {
+    try {
+      await supabase.from('notifications').insert({
+        user_id: userId,
+        type,
+        title,
+        message,
+        complaint_id: complaintId
+      });
+      loadData();
+    } catch (err) {
+      console.error('Error adding notification:', err.message);
+    }
+  };
+
+  const markNotificationRead = async (id) => {
+    // Optimistic update
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    try {
+      await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    } catch (err) {
+      console.error('Error marking read:', err.message);
+    }
+  };
+
+  const addComplaint = async (complaintData) => {
+    try {
+      // 1. Insert complaint
+      const { data: newComplaint, error: complaintError } = await supabase
+        .from('complaints')
+        .insert({
+          title: complaintData.title,
+          category: complaintData.category,
+          description: complaintData.description,
+          location: complaintData.location,
+          priority: complaintData.priority,
+          student_id: user.id,
+          status: 'submitted'
+        })
+        .select()
+        .single();
+        
+      if (complaintError) throw complaintError;
+
+      // 2. Insert initial activity
+      await supabase.from('activities').insert({
+        complaint_id: newComplaint.id,
+        activity_type: 'created'
+      });
+
+      await loadData();
+      return newComplaint;
+    } catch (err) {
+      console.error('Error adding complaint:', err.message);
+      throw err;
+    }
+  };
+
+  const updateComplaintStatus = async (id, newStatus, content) => {
+    try {
+      const complaint = complaints.find(c => c.id === id);
+      if (!complaint) return;
+
+      // If student reopening
+      if (user.role === 'student' && newStatus === 'under_review') {
+        const { error } = await supabase.rpc('reopen_complaint', { p_complaint_id: id });
+        if (error) throw error;
+        await loadData();
+        return;
       }
-      return c;
-    }));
+
+      // Admin updates status
+      const { error: updateError } = await supabase
+        .from('complaints')
+        .update({ status: newStatus })
+        .eq('id', id);
+        
+      if (updateError) throw updateError;
+
+      // Insert activity
+      await supabase.from('activities').insert({
+        complaint_id: id,
+        activity_type: 'status_change',
+        old_status: complaint.status,
+        new_status: newStatus,
+        content: content
+      });
+
+      // Send notification to student
+      if (complaint.status !== newStatus) {
+        await addNotification(
+          complaint.student_id,
+          'status_change',
+          'Complaint Status Updated',
+          `Your complaint ${complaint.display_id} has been ${newStatus.replace('_', ' ')}.`,
+          id
+        );
+      }
+
+      await loadData();
+    } catch (err) {
+      console.error('Error updating status:', err.message);
+    }
   };
   
-  const addResponse = (id, content) => {
-     setComplaints(complaints.map(c => {
-      if (c.id === id) {
-        const activity = {
-          id: `act-${Date.now()}`,
-          activity_type: 'response',
-          content,
-          created_at: new Date().toISOString(),
-        };
-        
-        // Notify student of response
-        addNotification(
-           c.student_id, 
-           'new_response', 
-           'New Response Received', 
-           `An admin responded to your complaint ${c.id}.`,
-           c.id
-        );
+  const addResponse = async (id, content) => {
+    try {
+      const complaint = complaints.find(c => c.id === id);
+      if (!complaint) return;
 
-        return {
-          ...c,
-          activities: [...c.activities, activity].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        };
-      }
-      return c;
-    }));
-  }
+      await supabase.from('activities').insert({
+        complaint_id: id,
+        activity_type: 'response',
+        content: content
+      });
+
+      // Notify student
+      await addNotification(
+        complaint.student_id,
+        'new_response',
+        'New Response Received',
+        `An admin responded to your complaint ${complaint.display_id}.`,
+        id
+      );
+
+      await loadData();
+    } catch (err) {
+      console.error('Error adding response:', err.message);
+    }
+  };
 
   return (
     <ComplaintContext.Provider value={{ 

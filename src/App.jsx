@@ -13,6 +13,7 @@ import { ReportComplaint } from './pages/ReportComplaint';
 import { ComplaintDetail } from './pages/ComplaintDetail';
 import { Settings } from './pages/Settings';
 import { Notifications } from './pages/Notifications';
+import { UserManagement } from './pages/admin/UserManagement';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useAuth();
@@ -50,7 +51,7 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="complaints" element={<ComplaintsList />} />
         <Route path="complaints/:id" element={<ComplaintDetail />} />
-        <Route path="users" element={<PlaceholderPage title="User Management" />} />
+        <Route path="users" element={<UserManagement />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="settings" element={<Settings />} />
       </Route>

@@ -4,7 +4,7 @@ import { LayoutDashboard, FileText, Settings, Users, Bell, LogOut, FileBarChart 
 import { useAuth } from '../../contexts/AuthContext';
 import './Sidebar.css';
 
-export const Sidebar = ({ role }) => {
+export const Sidebar = ({ role, isOpen }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -12,6 +12,7 @@ export const Sidebar = ({ role }) => {
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/complaints', icon: FileText, label: 'Complaints' },
     { to: '/admin/users', icon: Users, label: 'User Management' },
+    { to: '/admin/notifications', icon: Bell, label: 'Notifications' },
     { to: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
@@ -25,7 +26,7 @@ export const Sidebar = ({ role }) => {
   const links = role === 'admin' ? adminLinks : studentLinks;
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           <div className="logo-text">

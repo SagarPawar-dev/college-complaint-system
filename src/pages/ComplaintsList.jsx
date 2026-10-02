@@ -60,7 +60,7 @@ export const ComplaintsList = () => {
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600' }}>{complaint.id}</td>
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600' }}>{complaint.display_id || complaint.id}</td>
                     <td style={{ padding: '1rem 1.5rem' }}>{complaint.title}</td>
                     <td style={{ padding: '1rem 1.5rem', textTransform: 'capitalize' }}>{complaint.category}</td>
                     <td style={{ padding: '1rem 1.5rem', textTransform: 'capitalize' }}>{complaint.priority}</td>

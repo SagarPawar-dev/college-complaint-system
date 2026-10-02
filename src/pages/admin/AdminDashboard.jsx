@@ -100,7 +100,7 @@ export const AdminDashboard = () => {
                 <div>
                   <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{complaint.title}</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {complaint.id} • {new Date(complaint.created_at).toLocaleDateString()}
+                    {complaint.display_id || complaint.id} • {new Date(complaint.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div>
