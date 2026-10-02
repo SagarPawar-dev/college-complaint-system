@@ -4,8 +4,6 @@ A modern, transparent, and secure web application for colleges to manage and tra
 
 Built with React (Vite) and powered by Supabase (PostgreSQL), this system features real-time issue tracking, strict role-based access control, and enterprise-grade Row Level Security (RLS).
 
-## 🚀 Live Demo
-**Deployed on Vercel:** *(Add your vercel URL here!)*
 
 ## ✨ Features
 
