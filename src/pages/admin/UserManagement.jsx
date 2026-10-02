@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../../components/common/Card';
 import { supabase } from '../../lib/supabase';
-import { User, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, FileText } from 'lucide-react';
 import { useComplaints } from '../../contexts/ComplaintContext';
+import { useNavigate } from 'react-router-dom';
 
 export const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedUserId, setExpandedUserId] = useState(null);
-  const { complaints } = useComplaints(); // Getting all complaints
+  const [roleFilter, setRoleFilter] = useState('all');
+  const { complaints } = useComplaints();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
@@ -42,25 +45,37 @@ export const UserManagement = () => {
     return <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading users...</div>;
   }
 
+  const filteredUsers = users.filter(u => roleFilter === 'all' ? true : u.role === roleFilter);
+
   return (
     <Card noPadding>
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)' }}>
+      <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '18px', fontWeight: '600' }}>User Management</h2>
+        <select 
+          value={roleFilter} 
+          onChange={(e) => setRoleFilter(e.target.value)}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', outline: 'none', backgroundColor: 'var(--bg-card)', color: 'var(--text-main)' }}
+        >
+          <option value="all">All Roles</option>
+          <option value="student">Students</option>
+          <option value="admin">Admins</option>
+        </select>
       </div>
       
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table style={{ width: '100%', minWidth: '700px', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)' }}>
               <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>USER</th>
               <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>EMAIL</th>
               <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>ROLE</th>
+              <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>STATUS</th>
               <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>COMPLAINTS</th>
               <th style={{ padding: '1rem 1.5rem' }}></th>
             </tr>
           </thead>
           <tbody>
-            {users.map(userProfile => {
+            {filteredUsers.map(userProfile => {
               const userComplaints = complaints.filter(c => c.student_id === userProfile.id);
               const isExpanded = expandedUserId === userProfile.id;
               
@@ -89,7 +104,7 @@ export const UserManagement = () => {
                       </div>
                     </td>
                     <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>
-                      {userProfile.email || 'Email not synced'}
+                      {userProfile.email || '-'}
                     </td>
                     <td style={{ padding: '1rem 1.5rem' }}>
                       <span style={{
@@ -104,11 +119,35 @@ export const UserManagement = () => {
                         {userProfile.role}
                       </span>
                     </td>
+                    <td style={{ padding: '1rem 1.5rem' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '500', color: 'var(--color-green)' }}>
+                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-green)' }} />
+                        Active
+                      </span>
+                    </td>
                     <td style={{ padding: '1rem 1.5rem', fontWeight: '600' }}>
                       {userComplaints.length}
                     </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right', color: 'var(--text-muted)' }}>
-                      {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleUserExpanded(userProfile.id);
+                        }}
+                        style={{
+                          padding: '6px 16px',
+                          backgroundColor: isExpanded ? 'var(--bg-main)' : 'transparent',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: '500',
+                          color: 'var(--text-main)',
+                          fontSize: '13px',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {isExpanded ? 'Hide' : 'View'}
+                      </button>
                     </td>
                   </tr>
                   
@@ -124,17 +163,34 @@ export const UserManagement = () => {
                           ) : (
                             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                               {userComplaints.map(c => (
-                                <li key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', backgroundColor: 'var(--bg-main)', borderRadius: '4px', fontSize: '13px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <li 
+                                  key={c.id}
+                                  onClick={() => navigate(`/admin/complaints/${c.id}`)}
+                                  style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    padding: '1rem', 
+                                    backgroundColor: 'var(--bg-card)', 
+                                    borderRadius: '6px', 
+                                    fontSize: '13px',
+                                    cursor: 'pointer',
+                                    border: '1px solid var(--border-color)',
+                                    transition: 'border-color 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <FileText size={16} color="var(--primary)" />
-                                    <span style={{ fontWeight: '500' }}>{c.display_id || c.id}</span>
-                                    <span>- {c.title}</span>
+                                    <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{c.display_id || c.id}</span>
+                                    <span style={{ fontWeight: '500' }}>{c.title}</span>
                                   </div>
                                   <span style={{ 
-                                    padding: '2px 8px', 
+                                    padding: '4px 10px', 
                                     borderRadius: '12px', 
                                     backgroundColor: 'rgba(0,0,0,0.05)', 
-                                    textTransform: 'capitalize' 
+                                    textTransform: 'capitalize',
+                                    fontWeight: '500'
                                   }}>
                                     {c.status.replace('_', ' ')}
                                   </span>
