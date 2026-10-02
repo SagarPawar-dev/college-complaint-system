@@ -1,0 +1,18 @@
+.custom-card {
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.custom-card.no-padding {
+  padding: 0;
+}
+
+.custom-card:hover {
+  box-shadow: var(--shadow-md);
+}

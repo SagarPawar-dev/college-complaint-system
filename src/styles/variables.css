@@ -1,0 +1,36 @@
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Colors */
+  --bg-color: #f4f7f6;
+  --bg-card: #ffffff;
+  --sidebar-bg: #1a233a;
+  --sidebar-active-bg: #1e2b45;
+  --sidebar-text: #8e9bb0;
+  --sidebar-active-text: #20c997;
+  
+  --primary: #20c997;
+  --primary-hover: #1ba97e;
+  
+  --text-main: #333333;
+  --text-muted: #6c757d;
+  --text-light: #ffffff;
+  
+  --border-color: #e9ecef;
+  
+  /* Status/Border Colors */
+  --color-blue: #0d6efd;
+  --color-yellow: #fd7e14;
+  --color-green: #20c997; /* using primary teal */
+  --color-red: #dc3545;
+  --color-purple: #6f42c1;
+  --color-gray: #6c757d;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+  
+  /* Layout */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+}
