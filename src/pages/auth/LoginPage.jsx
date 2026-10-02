@@ -71,12 +71,6 @@ export const LoginPage = () => {
               Sign In
             </button>
           </form>
-          
-          <div style={{ marginTop: '2rem', fontSize: '13px', color: 'var(--text-muted)' }}>
-            <p style={{ fontWeight: '600', marginBottom: '0.5rem' }}>Test Credentials:</p>
-            <p>Student: student@example.com / student123</p>
-            <p>Admin: admin@example.com / admin123</p>
-          </div>
         </Card>
       </div>
     </div>

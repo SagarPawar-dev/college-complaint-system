@@ -12,7 +12,7 @@ export const Settings = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSave = async () => {

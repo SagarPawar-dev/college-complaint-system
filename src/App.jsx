@@ -2,10 +2,12 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
-import { PlaceholderPage } from './pages/PlaceholderPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ComplaintProvider } from './contexts/ComplaintContext';
 import { LoginPage } from './pages/auth/LoginPage';
+import { Landing } from './pages/Landing';
+import { Help } from './pages/Help';
+import { Privacy } from './pages/Privacy';
 
 // Pages
 import { ComplaintsList } from './pages/ComplaintsList';
@@ -19,7 +21,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
   
   if (requiredRole && user.role !== requiredRole) {
@@ -36,10 +38,12 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/privacy" element={<Privacy />} />
       
-      {/* Root redirect */}
+      {/* Root route: Landing page if not logged in, else dashboard */}
       <Route path="/" element={
-        user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <Navigate to="/login" replace />
+        user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <Landing />
       } />
       
       {/* Admin Routes */}
@@ -72,7 +76,7 @@ const AppRoutes = () => {
       
       {/* Catch-all */}
       <Route path="*" element={
-        user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <Navigate to="/login" replace />
+        user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <Navigate to="/" replace />
       } />
     </Routes>
   );

@@ -59,7 +59,7 @@ export const Sidebar = ({ role, isOpen, onClose }) => {
           className="logout-btn" 
           onClick={() => {
             logout();
-            navigate('/login');
+            navigate('/');
           }}
         >
           <LogOut size={20} />

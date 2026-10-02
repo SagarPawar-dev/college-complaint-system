@@ -27,7 +27,7 @@ export const TopBar = ({ title, subtitle, userRole, userName, toggleSidebar }) =
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
