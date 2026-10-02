@@ -189,9 +189,22 @@ export const ComplaintProvider = ({ children }) => {
     }
   };
 
+  const deleteComplaint = async (id) => {
+    try {
+      if (user.role !== 'admin') throw new Error('Unauthorized');
+      const { error } = await supabase.from('complaints').delete().eq('id', id);
+      if (error) throw error;
+      await loadData();
+      return true;
+    } catch (err) {
+      console.error('Error deleting complaint:', err.message);
+      return false;
+    }
+  };
+
   return (
     <ComplaintContext.Provider value={{ 
-      complaints, addComplaint, updateComplaintStatus, addResponse,
+      complaints, addComplaint, updateComplaintStatus, addResponse, deleteComplaint,
       notifications, markNotificationRead 
     }}>
       {children}

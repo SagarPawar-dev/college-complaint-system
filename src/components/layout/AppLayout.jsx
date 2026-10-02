@@ -25,7 +25,7 @@ export const AppLayout = ({ role, userName }) => {
 
   return (
     <div className="app-container">
-      <Sidebar role={role} isOpen={sidebarOpen} />
+      <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="main-content-wrapper">
         <TopBar 
           title={title} 

@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../components/common/Card';
 import { useComplaints } from '../contexts/ComplaintContext';
 import { useAuth } from '../contexts/AuthContext';
+import { Trash2 } from 'lucide-react';
 
 export const ComplaintDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { complaints, updateComplaintStatus, addResponse } = useComplaints();
+  const { complaints, updateComplaintStatus, addResponse, deleteComplaint } = useComplaints();
   const { role } = useAuth();
   
   const complaint = complaints.find(c => c.id === id);
@@ -35,6 +36,17 @@ export const ComplaintDetail = () => {
 
   const handleReopen = () => {
     updateComplaintStatus(id, 'under_review', 'Student requested to reopen the complaint.');
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this complaint? This action cannot be undone and will remove all related activities and notifications.')) {
+      const success = await deleteComplaint(id);
+      if (success) {
+        navigate('/admin/complaints');
+      } else {
+        alert('Failed to delete complaint. Please check your permissions.');
+      }
+    }
   };
 
   const getStatusColor = (status) => {
@@ -189,6 +201,33 @@ export const ComplaintDetail = () => {
                   Send Response
                 </button>
               </form>
+            </Card>
+
+            <Card topBorderColor="red">
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '1rem', color: 'var(--color-red)' }}>Administrative Actions</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                Permanently remove this complaint and all associated history from the database.
+              </p>
+              <button 
+                onClick={handleDelete}
+                style={{
+                  width: '100%',
+                  backgroundColor: 'transparent',
+                  color: 'var(--color-red)',
+                  padding: '0.75rem',
+                  borderRadius: '4px',
+                  fontWeight: '600',
+                  border: '1px solid var(--color-red)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Trash2 size={18} />
+                Delete Complaint
+              </button>
             </Card>
           </>
         ) : (

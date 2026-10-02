@@ -4,7 +4,7 @@ import { LayoutDashboard, FileText, Settings, Users, Bell, LogOut, FileBarChart 
 import { useAuth } from '../../contexts/AuthContext';
 import './Sidebar.css';
 
-export const Sidebar = ({ role, isOpen }) => {
+export const Sidebar = ({ role, isOpen, onClose }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -44,6 +44,7 @@ export const Sidebar = ({ role, isOpen }) => {
                 key={link.to} 
                 to={link.to} 
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+                onClick={onClose}
               >
                 <link.icon className="nav-icon" size={20} />
                 <span>{link.label}</span>

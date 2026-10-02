@@ -77,14 +77,9 @@ export const Settings = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
             <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '0.5rem' }}>Security</h3>
-            {role === 'admin' && (
-              <button style={{ padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: '4px', backgroundColor: 'transparent', textAlign: 'left', fontWeight: '500', cursor: 'pointer' }}>
-                Change Password
-              </button>
-            )}
             <button 
               onClick={handleLogout}
-              style={{ marginTop: role === 'admin' ? '0.5rem' : '0', padding: '0.75rem', border: '1px solid var(--color-red)', color: 'var(--color-red)', borderRadius: '4px', backgroundColor: 'transparent', textAlign: 'left', fontWeight: '500', cursor: 'pointer' }}
+              style={{ padding: '0.75rem', border: '1px solid var(--color-red)', color: 'var(--color-red)', borderRadius: '4px', backgroundColor: 'transparent', textAlign: 'left', fontWeight: '500', cursor: 'pointer' }}
             >
               Logout
             </button>

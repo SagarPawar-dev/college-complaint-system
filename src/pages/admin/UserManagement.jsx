@@ -49,7 +49,7 @@ export const UserManagement = () => {
       </div>
       
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-main)', borderBottom: '1px solid var(--border-color)' }}>
               <th style={{ padding: '1rem 1.5rem', fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)' }}>USER</th>
