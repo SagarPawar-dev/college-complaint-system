@@ -48,7 +48,7 @@ Built with React (Vite) and powered by Supabase (PostgreSQL), this system featur
    ```
 
 5. **Database Setup:**
-   *Note: To run this project from scratch, the Supabase PostgreSQL schema, RPC functions, and RLS policies must be applied via the Supabase SQL editor. A full schema reconstruction guide is available in the project files.*
+   *Note: To run this project from scratch, the Supabase PostgreSQL schema, RPC functions, and RLS policies must be applied via the Supabase SQL editor.*
 
 ---
 *Developed as a college mini-project.*
