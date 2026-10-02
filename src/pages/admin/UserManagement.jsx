@@ -84,12 +84,16 @@ export const UserManagement = () => {
                   <tr 
                     style={{ 
                       borderBottom: isExpanded ? 'none' : '1px solid var(--border-color)', 
-                      cursor: 'pointer',
+                      cursor: userProfile.role === 'admin' ? 'default' : 'pointer',
                       backgroundColor: isExpanded ? '#f8f9fa' : 'transparent',
                       transition: 'background-color 0.2s'
                     }}
-                    onClick={() => toggleUserExpanded(userProfile.id)}
-                    onMouseEnter={(e) => { if (!isExpanded) e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
+                    onClick={() => {
+                      if (userProfile.role !== 'admin') {
+                        toggleUserExpanded(userProfile.id);
+                      }
+                    }}
+                    onMouseEnter={(e) => { if (!isExpanded && userProfile.role !== 'admin') e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
                     onMouseLeave={(e) => { if (!isExpanded) e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
                     <td style={{ padding: '1rem 1.5rem' }}>
@@ -125,29 +129,31 @@ export const UserManagement = () => {
                         Active
                       </span>
                     </td>
-                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600' }}>
-                      {userComplaints.length}
+                    <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: userProfile.role === 'admin' ? 'var(--text-muted)' : 'inherit' }}>
+                      {userProfile.role === 'admin' ? 'N/A' : userComplaints.length}
                     </td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleUserExpanded(userProfile.id);
-                        }}
-                        style={{
-                          padding: '6px 16px',
-                          backgroundColor: isExpanded ? 'var(--bg-main)' : 'transparent',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontWeight: '500',
-                          color: 'var(--text-main)',
-                          fontSize: '13px',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        {isExpanded ? 'Hide' : 'View'}
-                      </button>
+                      {userProfile.role !== 'admin' && (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleUserExpanded(userProfile.id);
+                          }}
+                          style={{
+                            padding: '6px 16px',
+                            backgroundColor: isExpanded ? 'var(--bg-main)' : 'transparent',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: '500',
+                            color: 'var(--text-main)',
+                            fontSize: '13px',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {isExpanded ? 'Hide' : 'View'}
+                        </button>
+                      )}
                     </td>
                   </tr>
                   
