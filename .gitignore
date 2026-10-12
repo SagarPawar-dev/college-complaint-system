@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Java compiled files
+java-audit-tool/*.class
+
+# Generated audit report
+java-audit-tool/audit_report.txt
